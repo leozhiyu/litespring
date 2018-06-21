@@ -6,7 +6,7 @@
  * 如果仅仅在 DefaultBeanFactory 中用 Map 存储的话不方便扩展
 
  */
-package com.litespring.beans.support;
+package com.litespring.beans.factory.support;
 
 import com.litespring.beans.BeanDefinition;
 

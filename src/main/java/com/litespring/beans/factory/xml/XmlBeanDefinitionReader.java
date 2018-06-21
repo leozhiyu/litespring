@@ -1,14 +1,14 @@
 /**
  * @author:Leo
- * @create 2018/6/13
+ * @create 2018/6/20
  * @desc
  */
-package com.litespring.beans.support;
+package com.litespring.beans.factory.xml;
 
 import com.litespring.beans.BeanDefinition;
-import com.litespring.beans.factory.BeanCreationException;
 import com.litespring.beans.factory.BeanDefinitionStoreException;
-import com.litespring.beans.factory.BeanFactory;
+import com.litespring.beans.factory.support.BeanDefinitionRegistry;
+import com.litespring.beans.factory.support.GenericBeanDefinition;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -16,11 +16,9 @@ import org.dom4j.io.SAXReader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-public class DefaultBeanFactory implements BeanFactory {
+public class XmlBeanDefinitionReader {
 
     /**
      * 定义 xml 中 <bean> 标签的属性
@@ -28,17 +26,10 @@ public class DefaultBeanFactory implements BeanFactory {
     public static final String ID_ATTRIBUTE = "id";
     public static final String CLASS_ATTRIBUTE = "class";
 
-    /**
-     * 存放 bean 的定义，不仅存在 Map 中，BeanDefinition 的子类 GenericBeanDefinition 中也要存储，方便扩展
-     */
-    private final Map<String,BeanDefinition> beanDefinitionMap = new HashMap<String, BeanDefinition>();
+    BeanDefinitionRegistry registry;
 
-    /**
-     * 构造函数，在此初始化 bean 定义
-     * @param configFile
-     */
-    public DefaultBeanFactory(String configFile) {
-        loadBeanDefinition(configFile);
+    public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
+        this.registry = registry;
     }
 
     /**
@@ -49,7 +40,7 @@ public class DefaultBeanFactory implements BeanFactory {
      * 通过反射创建实例
      * @param configFile
      */
-    public void loadBeanDefinition(String configFile) {
+    public void loadBeanDefinitions(String configFile) {
         InputStream inputStream = null;
         try {
             // 获得类加载器
@@ -69,7 +60,7 @@ public class DefaultBeanFactory implements BeanFactory {
                 String beanID = el.attributeValue(ID_ATTRIBUTE);
                 String beanClassName = el.attributeValue(CLASS_ATTRIBUTE);
                 BeanDefinition beanDefinition = new GenericBeanDefinition(beanID,beanClassName);
-                this.beanDefinitionMap.put(beanID, beanDefinition);
+                this.registry.registerBeanDefinition(beanID, beanDefinition);
             }
         } catch (DocumentException e) {
             throw new BeanDefinitionStoreException("IOException parsing XML document failed", e);
@@ -81,35 +72,6 @@ public class DefaultBeanFactory implements BeanFactory {
                     e.printStackTrace();
                 }
             }
-        }
-    }
-
-    /**
-     * 根据 beanID 获取 bean 的定义
-     * @param id
-     * @return
-     */
-    public BeanDefinition getBeanDefinition(String id) {
-        return beanDefinitionMap.get(id);
-    }
-
-    /**
-     * 获得bean实例，通过反射实现
-     * @param id
-     * @return
-     */
-    public Object getBean(String id) {
-        BeanDefinition beanDefinition = this.getBeanDefinition(id);
-        if (beanDefinition == null) {
-            throw new BeanCreationException("Bean Definition does not exist");
-        }
-        String beanClassName = beanDefinition.getBeanClassName();
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        try {
-            Class clazz = classLoader.loadClass(beanClassName);
-            return clazz.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException("create bean for '" + beanClassName + "' failed" + e);
         }
     }
 }
