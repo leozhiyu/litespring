@@ -19,12 +19,12 @@ import java.io.InputStream;
 import java.util.Iterator;
 
 public class XmlBeanDefinitionReader {
-
     /**
      * 定义 xml 中 <bean> 标签的属性
      */
     public static final String ID_ATTRIBUTE = "id";
     public static final String CLASS_ATTRIBUTE = "class";
+    public static final String SCOPE_ATTRIBUTE = "scope";
 
     BeanDefinitionRegistry registry;
 
@@ -36,7 +36,7 @@ public class XmlBeanDefinitionReader {
      * 解析传进来的 xml 文件
      *
      * 将当前配置文件中所有的 bean 存放在 beanDefinitionMap 中
-     * 当需要 getBean 获取实例时，通过 BeanDefinition 获得className
+     * 当需要 getBean 获取实例时，通过 BeanDefinition 获得 className
      * 通过反射创建实例
      * @param resource
      */
@@ -60,6 +60,9 @@ public class XmlBeanDefinitionReader {
                 String beanID = el.attributeValue(ID_ATTRIBUTE);
                 String beanClassName = el.attributeValue(CLASS_ATTRIBUTE);
                 BeanDefinition beanDefinition = new GenericBeanDefinition(beanID,beanClassName);
+                if (el.attribute(SCOPE_ATTRIBUTE) != null) {
+                    beanDefinition.setScope(el.attributeValue(SCOPE_ATTRIBUTE));
+                }
                 this.registry.registerBeanDefinition(beanID, beanDefinition);
             }
         } catch (Exception e) {

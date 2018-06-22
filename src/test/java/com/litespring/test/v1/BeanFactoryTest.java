@@ -16,6 +16,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class BeanFactoryTest {
 
     DefaultBeanFactory factory = null;
@@ -33,11 +37,25 @@ public class BeanFactoryTest {
         reader.loadBeanDefinitions(new ClassPathResource("pet-v1.xml"));
         BeanDefinition beanDefinition = factory.getBeanDefinition("pet");
 
+        // 判断 bean 定义是否是单例
+
+        assertTrue(beanDefinition.isSingleton());
+
+        assertFalse(beanDefinition.isPrototype());
+
+        assertEquals(BeanDefinition.SCOPE_DEFAULT, beanDefinition.getScope());
+
         Assert.assertEquals("com.litespring.service.v1.PetService", beanDefinition.getBeanClassName());
 
         PetService petService = (PetService)factory.getBean("pet");
 
         Assert.assertNotNull(petService);
+
+        // 再次获取 bean，判断是否是单例
+        PetService petService1 = (PetService)factory.getBean("pet");
+
+        assertTrue(petService.equals(petService1));
+
     }
 
     @Test

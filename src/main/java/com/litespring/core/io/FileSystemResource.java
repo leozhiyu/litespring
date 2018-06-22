@@ -5,7 +5,7 @@
  */
 package com.litespring.core.io;
 
-import org.junit.Assert;
+import com.litespring.util.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ public class FileSystemResource implements Resource {
     private final File file;
 
     public FileSystemResource(String path) {
-        Assert.assertNotNull(path, "path must not be null");
+        Assert.notNull(path, "path must not be null");
         this.file = new File(path);
         this.path = path;
     }
