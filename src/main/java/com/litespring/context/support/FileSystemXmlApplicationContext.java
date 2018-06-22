@@ -8,17 +8,16 @@ package com.litespring.context.support;
 import com.litespring.beans.factory.support.DefaultBeanFactory;
 import com.litespring.beans.factory.xml.XmlBeanDefinitionReader;
 import com.litespring.context.ApplicationContext;
-import com.litespring.core.io.ClassPathResource;
+import com.litespring.core.io.FileSystemResource;
 import com.litespring.core.io.Resource;
 
-public class ClassPathXmlApplicationContext implements ApplicationContext {
-
+public class FileSystemXmlApplicationContext implements ApplicationContext {
     private DefaultBeanFactory factory = null;
 
-    public ClassPathXmlApplicationContext(String configFile) {
+    public FileSystemXmlApplicationContext(String configFile) {
         factory = new DefaultBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
-        Resource resource = new ClassPathResource(configFile);
+        Resource resource = new FileSystemResource(configFile);
         reader.loadBeanDefinitions(resource);
     }
 

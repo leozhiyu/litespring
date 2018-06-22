@@ -9,8 +9,8 @@ import com.litespring.beans.BeanDefinition;
 import com.litespring.beans.factory.BeanDefinitionStoreException;
 import com.litespring.beans.factory.support.BeanDefinitionRegistry;
 import com.litespring.beans.factory.support.GenericBeanDefinition;
+import com.litespring.core.io.Resource;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
@@ -38,15 +38,15 @@ public class XmlBeanDefinitionReader {
      * 将当前配置文件中所有的 bean 存放在 beanDefinitionMap 中
      * 当需要 getBean 获取实例时，通过 BeanDefinition 获得className
      * 通过反射创建实例
-     * @param configFile
+     * @param resource
      */
-    public void loadBeanDefinitions(String configFile) {
+    public void loadBeanDefinitions(Resource resource) {
         InputStream inputStream = null;
         try {
             // 获得类加载器
             ClassLoader classLoader = this.getClass().getClassLoader();
             // 通过类加载器获得文件输入流
-            inputStream = classLoader.getResourceAsStream(configFile);
+            inputStream = resource.getInputStream();
             // 创建 dom4j 对象
             SAXReader saxReader = new SAXReader();
 
@@ -62,7 +62,7 @@ public class XmlBeanDefinitionReader {
                 BeanDefinition beanDefinition = new GenericBeanDefinition(beanID,beanClassName);
                 this.registry.registerBeanDefinition(beanID, beanDefinition);
             }
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             throw new BeanDefinitionStoreException("IOException parsing XML document failed", e);
         } finally {
             if (inputStream != null) {
