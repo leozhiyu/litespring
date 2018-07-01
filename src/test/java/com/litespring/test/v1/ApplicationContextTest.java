@@ -14,7 +14,8 @@ import org.junit.Test;
 
 public class ApplicationContextTest {
     @Test
-    public void testGetBean() {
+    public void testGetBeanFromXmlApplicationContext() {
+        // 通过定义的 xml 文件，创建上下文对象
         ApplicationContext ctx = new ClassPathXmlApplicationContext("pet-v1.xml");
         PetService petService = (PetService) ctx.getBean("pet");
         Assert.assertNotNull(petService);

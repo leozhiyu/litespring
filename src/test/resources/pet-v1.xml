@@ -2,4 +2,5 @@
 <beans>
     <bean id="pet" class="com.litespring.service.v1.PetService">
     </bean>
+    <bean id="invalidBean" class="xxx.xxx" />
 </beans>

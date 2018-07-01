@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id = "petStore" class="com.litespring.service.v2.PetStoreService">
+        <property name="accountDao" ref="accountDao"/>
+        <property name="itemDao" ref="itemDao" />
+        <property name="owner" value="leo" />
+    </bean>
+    <bean id="accountDao" class="com.litespring.dao.v2.AccountDao" />
+    <bean id="itemDao" class="com.litespring.dao.v2.ItemDao" />
+</beans>

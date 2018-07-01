@@ -6,11 +6,16 @@
 package com.litespring.beans.factory.support;
 
 import com.litespring.beans.BeanDefinition;
+import com.litespring.beans.PropertyValue;
 import com.litespring.beans.factory.BeanCreationException;
 import com.litespring.beans.factory.config.ConfigurableBeanFactory;
 import com.litespring.util.ClassUtil;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
@@ -47,7 +52,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     public Object getBean(String id) {
         BeanDefinition beanDefinition = this.getBeanDefinition(id);
         if (beanDefinition == null) {
-            return null;
+            throw new BeanCreationException("未定义 bean");
         }
         // 先判断这个 bean 是否是单例
         if (beanDefinition.isSingleton()) {
@@ -62,6 +67,14 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     }
 
     private Object createBean(BeanDefinition bd) {
+        // 初始化bean
+        Object bean = this.instantiateBean(bd);
+        // 设置属性
+        this.populateBean(bd, bean);
+        return bean;
+    }
+
+    private Object instantiateBean(BeanDefinition bd) {
         String beanClassName = bd.getBeanClassName();
         ClassLoader classLoader = this.getBeanClassLoader();
         try {
@@ -72,12 +85,40 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         }
     }
 
-    @Override
+    private void populateBean(BeanDefinition bd, Object bean) {
+        List<PropertyValue> propertyValues = bd.getPropertyValues();
+
+        if (propertyValues == null || propertyValues.isEmpty()) {
+            return;
+        }
+
+        // setter 注入
+
+        BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+        try {
+            for (PropertyValue pv : propertyValues) {
+                String propertyName = pv.getName();
+                Object propertyValue = pv.getValue();
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(propertyValue);
+                // 获得 bean 信息
+                BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+                // 获得属性描述符，通过反射 set 值
+                PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
+                for (PropertyDescriptor pd : descriptors) {
+                    if (pd.getName().equals(propertyName)) {
+                        pd.getWriteMethod().invoke(bean, resolvedValue);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new BeanCreationException("Failed to obtain BeanInfo for class [" + bd.getBeanClassName() + "]", e);
+        }
+    }
+
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
         this.beanClassLoader = beanClassLoader;
     }
 
-    @Override
     public ClassLoader getBeanClassLoader() {
         return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtil.getDefaultClassLoader());
     }
