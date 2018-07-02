@@ -25,7 +25,7 @@ public class BeanDefinitionTest {
         BeanDefinition bd = factory.getBeanDefinition("petStore");
         List<PropertyValue> propertyValues =  bd.getPropertyValues();
         // 测试是否拿到 property 元素
-        Assert.assertTrue(propertyValues.size() == 2);
+        Assert.assertTrue(propertyValues.size() == 3);
         // 测试 ref 属性
         {
             PropertyValue pv = this.getPropertyValue("accountDao", propertyValues);

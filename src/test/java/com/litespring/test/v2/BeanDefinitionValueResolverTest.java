@@ -24,8 +24,7 @@ public class BeanDefinitionValueResolverTest {
         DefaultBeanFactory factory = new DefaultBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(new ClassPathResource("petstore-v2.xml"));
-
-        BeanDefinitionValueResolver resolver = new BeanDefinitionValueResolver(factory);
+        resolver = new BeanDefinitionValueResolver(factory);
     }
     @Test
     public void testResolveRuntimeBeanReference() {
@@ -43,4 +42,5 @@ public class BeanDefinitionValueResolverTest {
         Assert.assertEquals("owner", typedStringValue.getValue());
 
     }
+
 }

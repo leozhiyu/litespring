@@ -7,9 +7,10 @@ package com.litespring.beans.factory.support;
 
 import com.litespring.beans.BeanDefinition;
 import com.litespring.beans.PropertyValue;
+import com.litespring.beans.SimpleTypeConverter;
 import com.litespring.beans.factory.BeanCreationException;
 import com.litespring.beans.factory.config.ConfigurableBeanFactory;
-import com.litespring.util.ClassUtil;
+import com.litespring.util.ClassUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -95,6 +96,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         // setter 注入
 
         BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+        SimpleTypeConverter converter = new SimpleTypeConverter();
         try {
             for (PropertyValue pv : propertyValues) {
                 String propertyName = pv.getName();
@@ -106,7 +108,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
                 PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
                 for (PropertyDescriptor pd : descriptors) {
                     if (pd.getName().equals(propertyName)) {
-                        pd.getWriteMethod().invoke(bean, resolvedValue);
+                        Object convertedValue = converter.convertIfNecessary(resolvedValue, pd.getPropertyType());
+                        pd.getWriteMethod().invoke(bean, convertedValue);
                     }
                 }
             }
@@ -120,6 +123,6 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     }
 
     public ClassLoader getBeanClassLoader() {
-        return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtil.getDefaultClassLoader());
+        return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtils.getDefaultClassLoader());
     }
 }

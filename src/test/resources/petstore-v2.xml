@@ -4,6 +4,7 @@
         <property name="accountDao" ref="accountDao"/>
         <property name="itemDao" ref="itemDao" />
         <property name="owner" value="leo" />
+        <property name="version" value="1" />
     </bean>
     <bean id="accountDao" class="com.litespring.dao.v2.AccountDao" />
     <bean id="itemDao" class="com.litespring.dao.v2.ItemDao" />

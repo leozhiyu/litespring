@@ -9,7 +9,7 @@ import com.litespring.beans.factory.support.DefaultBeanFactory;
 import com.litespring.beans.factory.xml.XmlBeanDefinitionReader;
 import com.litespring.context.ApplicationContext;
 import com.litespring.core.io.Resource;
-import com.litespring.util.ClassUtil;
+import com.litespring.util.ClassUtils;
 
 public abstract class AbstractApplicationContext implements ApplicationContext{
     private DefaultBeanFactory factory = null;
@@ -37,6 +37,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext{
 
     @Override
     public ClassLoader getBeanClassLoader() {
-        return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtil.getDefaultClassLoader());
+        return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtils.getDefaultClassLoader());
     }
 }
