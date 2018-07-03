@@ -6,6 +6,7 @@
 package com.litespring.beans.factory.xml;
 
 import com.litespring.beans.BeanDefinition;
+import com.litespring.beans.ConstructorArgument;
 import com.litespring.beans.PropertyValue;
 import com.litespring.beans.factory.BeanDefinitionStoreException;
 import com.litespring.beans.factory.config.RuntimeBeanReference;
@@ -13,6 +14,7 @@ import com.litespring.beans.factory.config.TypedStringValue;
 import com.litespring.beans.factory.support.BeanDefinitionRegistry;
 import com.litespring.beans.factory.support.GenericBeanDefinition;
 import com.litespring.core.io.Resource;
+import com.litespring.util.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -33,6 +35,8 @@ public class XmlBeanDefinitionReader {
     public static final String REF_ATTRIBUTE = "ref";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String NAME_ATTRIBUTE = "name";
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-args";
+    public static final String TYPE_ATTRIBUTE = "type";
 
     BeanDefinitionRegistry registry;
 
@@ -71,6 +75,7 @@ public class XmlBeanDefinitionReader {
                 if (el.attribute(SCOPE_ATTRIBUTE) != null) {
                     beanDefinition.setScope(el.attributeValue(SCOPE_ATTRIBUTE));
                 }
+                parseConstructorArgElements(el, beanDefinition);
                 parsePropertyElement(el, beanDefinition);
                 this.registry.registerBeanDefinition(beanID, beanDefinition);
             }
@@ -85,6 +90,33 @@ public class XmlBeanDefinitionReader {
                 }
             }
         }
+    }
+
+    private void parseConstructorArgElements(Element beanElem, BeanDefinition bd) {
+        Iterator<Element> iterator = beanElem.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while (iterator.hasNext()) {
+            Element ele = iterator.next();
+            parseConstructorArgElement(ele, bd);
+        }
+    }
+
+    private void parseConstructorArgElement(Element beanElem, BeanDefinition bd) {
+        String typeAttr = beanElem.attributeValue(TYPE_ATTRIBUTE);
+        String nameAttr = beanElem.attributeValue(NAME_ATTRIBUTE);
+        // 设置值，value 或者 ref 属性
+        Object value = parsePropertyValue(beanElem, bd, null);
+
+        // 给其他属性赋值
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if (StringUtils.hasLength(typeAttr)) {
+            valueHolder.setType(typeAttr);
+        }
+
+        if (StringUtils.hasLength(nameAttr)) {
+            valueHolder.setName(nameAttr);
+        }
+
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     private void parsePropertyElement(Element beanElem, BeanDefinition bd) {

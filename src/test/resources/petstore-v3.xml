@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id = "petStore" class="com.litespring.service.v3.PetStoreService">
+        <constructor-args ref = "accountDao" />
+        <constructor-args ref = "itemDao" />
+        <constructor-args value = "1" />
+    </bean>
+    <bean id="accountDao" class="com.litespring.dao.v3.AccountDao" />
+    <bean id="itemDao" class="com.litespring.dao.v3.ItemDao" />
+</beans>
